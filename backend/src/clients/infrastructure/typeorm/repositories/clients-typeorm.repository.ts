@@ -26,8 +26,6 @@ export class ClientsTypeormRepository implements ClientsRepository {
   }
 
   async insert(model: ClientsModel): Promise<ClientsModel> {
-    this.conflictingCPF(model.cpf);
-
     return this.clientsRepository.save(model);
   }
 

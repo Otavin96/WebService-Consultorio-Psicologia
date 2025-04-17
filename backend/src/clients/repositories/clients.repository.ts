@@ -12,7 +12,6 @@ export type CreateClientsProps = {
   address: Address;
   contact: Contact;
   roles: RolesProps;
-  scheduling: Scheduling[];
 };
 
 export interface ClientsRepository
