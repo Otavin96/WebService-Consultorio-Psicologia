@@ -1,39 +1,51 @@
-import { ClientsModel, RolesProps } from "@/clients/domain/models/clients.model";
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  ClientsModel,
+  RolesProps,
+} from "@/clients/domain/models/clients.model";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 import { Address } from "./Address";
 import { Contact } from "./Contact";
-
+import { Scheduling } from "@/scheduling/infrastructure/typeorm/entities/scheduling.entity";
 
 @Entity("clients")
 export class Client implements ClientsModel {
-    
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @Column("text")
-    cpf: string;
+  @Column("text")
+  cpf: string;
 
-    @Column("text")
-    name: string;
+  @Column("text")
+  name: string;
 
-    @Column("text")
-    surname: string;
+  @Column("text")
+  surname: string;
 
-    @Column({ type: 'timestamp'})
-    dateOfBirth: Date;
+  @Column({ type: "timestamp" })
+  dateOfBirth: Date;
 
-    @Column(() => Address)
-    address: Address;
-    
-    @Column(() => Contact)
-    contact: Contact;
+  @Column(() => Address)
+  address: Address;
 
-    @Column({ type: "enum", enum: RolesProps })
-    roles: RolesProps;
+  @Column(() => Contact)
+  contact: Contact;
 
-    @CreateDateColumn()
-    created_at: Date;
+  @Column({ type: "enum", enum: RolesProps })
+  roles: RolesProps;
 
-    @UpdateDateColumn()
-    updated_at: Date;
+  @OneToMany(() => Scheduling, (scheduling) => scheduling.client)
+  scheduling: Scheduling[];
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }
