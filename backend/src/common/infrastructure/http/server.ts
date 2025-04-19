@@ -1,7 +1,8 @@
+import "reflect-metadata";
+import "@/common/infrastructure/container";
 import { app } from "./app";
 import { env } from "../env";
 import { dataSource } from "../typeorm";
-import "@/common/infrastructure/container";
 
 async function startServer() {
   try {

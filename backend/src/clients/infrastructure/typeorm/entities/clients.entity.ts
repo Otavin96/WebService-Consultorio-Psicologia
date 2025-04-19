@@ -6,6 +6,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -37,7 +38,10 @@ export class Client implements ClientsModel {
   @Column(() => Contact)
   contact: Contact;
 
-  @Column({ type: "enum", enum: RolesProps })
+  @Column({
+    type: "enum",
+    enum: RolesProps,
+  })
   roles: RolesProps;
 
   @OneToMany(() => Scheduling, (scheduling) => scheduling.client)

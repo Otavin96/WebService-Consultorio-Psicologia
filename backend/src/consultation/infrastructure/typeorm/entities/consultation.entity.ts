@@ -8,6 +8,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -18,17 +19,11 @@ export class Consultation implements ConsultationModel {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ type: "date" })
-  date: Date;
-
-  @Column({ type: "time" })
-  time: Date;
-
   @Column({ type: "enum", enum: Status })
   situation: Status;
 
-  @Column("text")
-  prevConsultation: string;
+  @Column({ type: "jsonb", nullable: true })
+  previousConsultations: { date: string; note: string }[];
 
   @Column("text")
   currentQuery: string;
@@ -37,10 +32,10 @@ export class Consultation implements ConsultationModel {
   patientAttention: string;
 
   @OneToOne(() => Scheduling, (scheduling) => scheduling.consultation, {
-    cascade: ["insert", "update"],
-    onDelete: "CASCADE",
     nullable: false,
+    onDelete: "CASCADE",
   })
+  @JoinColumn({ name: "scheduling_id" })
   scheduling: Scheduling;
 
   @CreateDateColumn()

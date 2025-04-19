@@ -36,7 +36,7 @@ export class ClientsTypeormRepository implements ClientsRepository {
   async update(model: ClientsModel): Promise<ClientsModel> {
     await this._get(model.id);
 
-    await this.clientsRepository.update({ id: model.cpf }, model);
+    await this.clientsRepository.update({ id: model.id }, model);
 
     return model;
   }

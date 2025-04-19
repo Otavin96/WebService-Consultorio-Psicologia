@@ -35,12 +35,7 @@ export class Scheduling implements SchedulingModel {
   @JoinColumn({ name: "client_id" })
   client: Client;
 
-  @OneToOne(() => Consultation, (consultation) => consultation.scheduling, {
-    nullable: false,
-    cascade: ["insert", "update"],
-    onDelete: "CASCADE",
-  })
-  @JoinColumn({ name: "consultation_id" }) // Aqui a FK fica em `schedulings`
+  @OneToOne(() => Consultation, (consultation) => consultation.scheduling)
   consultation: Consultation;
 
   @CreateDateColumn()

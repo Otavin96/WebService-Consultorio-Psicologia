@@ -7,10 +7,8 @@ export enum Status {
 
 export interface ConsultationModel {
   id: string;
-  date: Date;
-  time: Date;
   situation: Status;
-  prevConsultation: string;
+  previousConsultations: { date: string; note: string }[];
   currentQuery: string;
   patientAttention: string;
   scheduling: Scheduling;
