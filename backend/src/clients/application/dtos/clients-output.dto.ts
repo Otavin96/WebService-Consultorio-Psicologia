@@ -5,6 +5,7 @@ import { Scheduling } from "@/scheduling/infrastructure/typeorm/entities/schedul
 export enum RolesProps {
   SECRETARIA = "secretaria",
   PROFISSIONAL_SAUDE = "profissional_saude",
+  USER = "usuario",
 }
 
 export type ClientsOutput = {
