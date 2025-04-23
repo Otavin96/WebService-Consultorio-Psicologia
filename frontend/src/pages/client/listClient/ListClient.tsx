@@ -39,7 +39,7 @@ const ListClient = () => {
               <L.Td>00/00/0000</L.Td>
               <L.Td>
                 <L.Span>
-                  <L.LinkIcon to="#">
+                  <L.LinkIcon to="/editar/cliente">
                     <FaUserEdit />
                   </L.LinkIcon>
                   <L.LinkIcon to="#">
