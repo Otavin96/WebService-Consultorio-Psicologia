@@ -39,10 +39,10 @@ function ListScheduling() {
                     <L.LinkIcon to="/editar/cliente">
                     <IoCreateSharp />
                     </L.LinkIcon>
-                    <L.LinkIcon to="#">
+                    <L.LinkIcon to="">
                       <RiDeleteBinFill />
                     </L.LinkIcon>
-                    <L.LinkIcon to="#">
+                    <L.LinkIcon to="/inserir/consulta">
                     <MdAccessTimeFilled />
                     </L.LinkIcon>
                   </L.Span>

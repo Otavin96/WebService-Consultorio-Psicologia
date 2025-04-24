@@ -45,7 +45,7 @@ const ListClient = () => {
                   <L.LinkIcon to="#">
                     <RiDeleteBinFill />
                   </L.LinkIcon>
-                  <L.LinkIcon to="#">
+                  <L.LinkIcon to="/inserir/agendamento">
                     <IoCalendar />
                   </L.LinkIcon>
                 </L.Span>

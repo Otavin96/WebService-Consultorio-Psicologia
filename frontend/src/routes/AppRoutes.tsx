@@ -6,6 +6,7 @@ import InsertClient from "../pages/client/InsertClient/InsertClient";
 import EditClient from "../pages/client/EditClient/EditClient";
 import ListScheduling from "../pages/scheduling/list/ListScheduling";
 import InsertScheduling from "../pages/scheduling/Insert/InsertScheduling";
+import InsertConsultation from "../pages/consultation/InsertConsultation";
 
 const AppRoutes = () => {
   return (
@@ -20,6 +21,8 @@ const AppRoutes = () => {
 
           <Route path="/listar/agendamento" element={<ListScheduling />} />
           <Route path="/inserir/agendamento" element={<InsertScheduling />} />
+
+          <Route path="/inserir/consulta" element={<InsertConsultation />} />
         </Routes>
       </BrowserRouter>
     </div>
