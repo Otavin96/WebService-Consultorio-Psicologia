@@ -14,7 +14,7 @@ import { ILike, Repository } from "typeorm";
 
 @injectable()
 export class ClientsTypeormRepository implements ClientsRepository {
-  sortableFields: string[] = ["name", "created_at"];
+  sortableFields: string[] = ["name"];
 
   constructor(
     @inject("ClientsDefaultTypeormRepository")
@@ -53,8 +53,8 @@ export class ClientsTypeormRepository implements ClientsRepository {
     const validSortDir =
       (props.sort_dir && dirOps.includes(props.sort_dir.toLowerCase())) ||
       false;
-    const orderByField = validSort ? props.sort : "created_at";
-    const orderByDir = validSortDir ? props.sort_dir : "desc";
+    const orderByField = validSort ? props.sort : "name";
+    const orderByDir = validSortDir ? props.sort_dir : "asc";
     const [users, total] = await this.clientsRepository.findAndCount({
       ...(props.filter && {
         where: {

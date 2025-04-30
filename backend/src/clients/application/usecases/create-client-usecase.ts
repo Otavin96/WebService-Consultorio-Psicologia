@@ -1,6 +1,6 @@
 import { Address } from "@/clients/infrastructure/typeorm/entities/Address";
 import { Contact } from "@/clients/infrastructure/typeorm/entities/Contact";
-import { ClientsOutput, RolesProps } from "../dtos/clients-output.dto";
+import { ClientsOutput } from "../dtos/clients-output.dto";
 import { inject, injectable } from "tsyringe";
 import { ClientsRepository } from "@/clients/repositories/clients.repository";
 import { BadRequestError } from "@/common/domain/errors/badRequest-error";
@@ -13,7 +13,7 @@ export namespace CreateClientUseCase {
     dateOfBirth: Date;
     address: Address;
     contact: Contact;
-    roles: RolesProps;
+    billingAddress: Address;
   };
 
   export type Output = ClientsOutput;
@@ -32,7 +32,7 @@ export namespace CreateClientUseCase {
         !input.address ||
         !input.dateOfBirth ||
         !input.contact ||
-        !input.roles
+        !input.billingAddress
       ) {
         throw new BadRequestError("Input data not provedid or invalid");
       }

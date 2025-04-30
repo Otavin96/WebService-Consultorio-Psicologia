@@ -59,6 +59,12 @@ export const Td = styled.td`
   padding-left: 10px;
 `;
 
+export const TdNull = styled(Td)`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+`;
+
 export const Span = styled.span`
   display: flex;
   flex-direction: row;

@@ -29,7 +29,7 @@ export class Client implements ClientsModel {
   @Column("text")
   surname: string;
 
-  @Column({ type: "timestamp" })
+  @Column({ type: "date" })
   dateOfBirth: Date;
 
   @Column(() => Address)
@@ -38,11 +38,8 @@ export class Client implements ClientsModel {
   @Column(() => Contact)
   contact: Contact;
 
-  @Column({
-    type: "enum",
-    enum: RolesProps,
-  })
-  roles: RolesProps;
+  @Column(() => Address)
+  billingAddress: Address;
 
   @OneToMany(() => Scheduling, (scheduling) => scheduling.client)
   scheduling: Scheduling[];

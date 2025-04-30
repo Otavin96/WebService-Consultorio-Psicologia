@@ -10,7 +10,7 @@ export type CreateClientsProps = {
   dateOfBirth: Date;
   address: Address;
   contact: Contact;
-  roles: RolesProps;
+  billingAddress: Address;
 };
 
 export interface ClientsRepository

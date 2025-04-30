@@ -16,7 +16,7 @@ export interface ClientsModel {
   dateOfBirth: Date;
   address: Address;
   contact: Contact;
-  roles: RolesProps;
+  billingAddress: Address;
   scheduling: Scheduling[];
   created_at: Date;
   updated_at: Date;

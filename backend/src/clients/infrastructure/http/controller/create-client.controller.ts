@@ -11,33 +11,33 @@ export async function CreateClientController(
 ) {
   // Contact schema
   const ContactSchema = z.object({
-    phone: z.string(),
-    whatsApp: z.string(),
-    email: z.string().email(),
+    phone: z.string().min(1, "Telefone obrigatório"),
+    whatsApp: z.string().min(1, "O numero do Whatsapp é obrigatório"),
+    email: z.string().email("E-mail inválido"),
   });
 
   // Address schema
   const AddressSchema = z.object({
-    cep: z.string(),
-    publicPlace: z.string(),
-    numberHouse: z.number(),
-    neighborhood: z.string(),
-    state: z.string(),
-    city: z.string(),
+    cep: z.string().min(1, "CEP obrigatório"),
+    publicPlace: z.string().min(1, "Logradouro obrigatório"),
+    numberHouse: z.coerce.string(),
+    neighborhood: z.string().min(1, "Bairro obrigatório"),
+    state: z.string().min(1, "Estado obrigatório"),
+    city: z.string().min(1, "Cidade obrigatória"),
   });
 
   // Client schema
   const CreateClientSchemaBody = z.object({
-    cpf: z.string(),
-    name: z.string(),
-    surname: z.string(),
-    dateOfBirth: z.coerce.date(), // aceita string ou Date
-    roles: z.nativeEnum(RolesProps),
+    cpf: z.string().min(1, "CPF obrigatório"),
+    name: z.string().min(1, "Nome obrigatório"),
+    surname: z.string().min(1, "Sobrenome obrigatório"),
+    dateOfBirth: z.coerce.date(),
     contact: ContactSchema,
     address: AddressSchema,
+    billingAddress: z.lazy(() => AddressSchema),
   });
 
-  const { cpf, name, surname, dateOfBirth, roles, contact, address } =
+  const { cpf, name, surname, dateOfBirth, contact, address, billingAddress } =
     dataValidation(CreateClientSchemaBody, request.body);
 
   const createClientUseCase: CreateClientUseCase.UseCase = container.resolve(
@@ -49,9 +49,9 @@ export async function CreateClientController(
     name,
     surname,
     dateOfBirth,
-    roles,
     contact,
     address,
+    billingAddress,
   });
 
   response.status(201).json(client);

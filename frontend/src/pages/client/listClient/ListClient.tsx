@@ -5,8 +5,16 @@ import { RiDeleteBinFill } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import Pagination from "../../../components/pagination/Pagination";
 
+import { useQuery } from "@tanstack/react-query";
+import { fetchClients } from "../../../services/clientService";
+
 const ListClient = () => {
-  const map: number[] = [5, 5, 5, 5, 5];
+  const { data: clientsResponse, isPending } = useQuery({
+    queryKey: ["clients"],
+    queryFn: fetchClients,
+  });
+
+  if (isPending) return <h1>Loading</h1>;
 
   return (
     <L.Container>
@@ -26,20 +34,26 @@ const ListClient = () => {
           </L.Tr>
         </L.Thead>
         <L.Tbody>
-          {map.map((item, index) => (
-            <L.Tr key={index}>
+          {clientsResponse?.length === 0 && (
+            <L.TdNull colSpan={6}>Lista de clientes vazia</L.TdNull>
+          )}
+          {clientsResponse?.map((client, index) => (
+            <L.Tr key={client.id}>
               <L.Td>{index + 1}</L.Td>
-              <L.Td>John Due</L.Td>
-              <L.Td>(99) 99999-9999</L.Td>
+              <L.Td>{client.name}</L.Td>
+              <L.Td>{client.contact.phone}</L.Td>
               <L.Td>
-                <Link to="https://api.whatsapp.com/send/?phone=988010148">
-                  99999-9999
+                <Link
+                  to={`https://api.whatsapp.com/send/?phone=${client.contact.whatsApp}`}
+                >
+                  {client.contact.whatsApp}
                 </Link>
               </L.Td>
-              <L.Td>00/00/0000</L.Td>
+              <L.Td>{client.dateOfBirth}</L.Td>
               <L.Td>
                 <L.Span>
-                  <L.LinkIcon to="/editar/cliente">
+                  {/* <L.LinkIcon to="/editar/cliente"> */}
+                  <L.LinkIcon to={"/editar/cliente"} state={client.id}>
                     <FaUserEdit />
                   </L.LinkIcon>
                   <L.LinkIcon to="#">

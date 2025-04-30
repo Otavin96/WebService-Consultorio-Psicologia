@@ -17,4 +17,6 @@ export const Input = styled.input<{ hasError?: boolean }>`
     `}
 `;
 
-export const HelperText = styled.p``;
+export const HelperText = styled.p`
+  padding-top: 3px;
+`;

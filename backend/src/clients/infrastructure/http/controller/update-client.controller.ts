@@ -1,5 +1,4 @@
 import { UpdateClientUseCase } from "@/clients/application/usecases/update-client-usecase";
-import { RolesProps } from "@/clients/domain/models/clients.model";
 import { dataValidation } from "@/common/infrastructure/validation/zod";
 import { Request, Response } from "express";
 import { container } from "tsyringe";
@@ -26,7 +25,7 @@ export async function UpdateClientController(
   const AddressSchema = z.object({
     cep: z.string().optional(),
     publicPlace: z.string().optional(),
-    numberHouse: z.number().optional(),
+    numberHouse: z.coerce.string().optional(),
     neighborhood: z.string().optional(),
     state: z.string().optional(),
     city: z.string().optional(),
@@ -38,7 +37,7 @@ export async function UpdateClientController(
       name: z.string().optional(),
       surname: z.string().optional(),
       dateOfBirth: z.coerce.date().optional(), // aceita string ou Date
-      roles: z.nativeEnum(RolesProps).optional(),
+      billingAddress: z.lazy(() => AddressSchema).optional(),
       contact: ContactSchema.optional().refine(
         (val) => val === undefined || Object.keys(val).length > 0,
         {
@@ -58,7 +57,7 @@ export async function UpdateClientController(
       message: "Pelo menos um campo deve ser fornecido para atualização.",
     });
 
-  const { name, surname, dateOfBirth, roles, contact, address } =
+  const { name, surname, dateOfBirth, contact, address, billingAddress } =
     dataValidation(UpdateClientSchemaBody, request.body);
 
   const updateClientUseCase: UpdateClientUseCase.UseCase = container.resolve(
@@ -72,10 +71,8 @@ export async function UpdateClientController(
     dateOfBirth,
     contact,
     address,
-    roles,
+    billingAddress,
   });
-
-  console.log(client);
 
   response.status(201).json(client);
 }

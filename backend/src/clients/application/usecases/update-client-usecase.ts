@@ -1,5 +1,5 @@
 import { Contact } from "@/clients/infrastructure/typeorm/entities/Contact";
-import { ClientsOutput, RolesProps } from "../dtos/clients-output.dto";
+import { ClientsOutput } from "../dtos/clients-output.dto";
 import { inject, injectable } from "tsyringe";
 import { ClientsRepository } from "@/clients/repositories/clients.repository";
 import { Address } from "@/clients/infrastructure/typeorm/entities/Address";
@@ -12,7 +12,7 @@ export namespace UpdateClientUseCase {
     dateOfBirth: Date;
     address: Address;
     contact: Contact;
-    roles: RolesProps;
+    billingAddress: Address;
   };
 
   export type Output = ClientsOutput;
@@ -32,6 +32,10 @@ export namespace UpdateClientUseCase {
 
       if (input.surname) {
         client.surname = input.surname;
+      }
+
+      if (input.dateOfBirth) {
+        client.dateOfBirth = input.dateOfBirth;
       }
 
       if (input.contact?.phone) {
@@ -70,12 +74,28 @@ export namespace UpdateClientUseCase {
         client.address.city = input.address.city;
       }
 
-      if (input.dateOfBirth) {
-        client.dateOfBirth = input.dateOfBirth;
+      if (input.billingAddress?.cep) {
+        client.billingAddress.cep = input.billingAddress.cep;
       }
 
-      if (input.roles) {
-        client.roles = input.roles;
+      if (input.billingAddress?.publicPlace) {
+        client.billingAddress.publicPlace = input.billingAddress.publicPlace;
+      }
+
+      if (input.billingAddress?.numberHouse) {
+        client.billingAddress.numberHouse = input.billingAddress.numberHouse;
+      }
+
+      if (input.billingAddress?.neighborhood) {
+        client.billingAddress.neighborhood = input.billingAddress.neighborhood;
+      }
+
+      if (input.billingAddress?.state) {
+        client.billingAddress.state = input.billingAddress.state;
+      }
+
+      if (input.billingAddress?.city) {
+        client.billingAddress.city = input.billingAddress.city;
       }
 
       const updatedClient: ClientsOutput =
