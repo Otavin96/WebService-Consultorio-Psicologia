@@ -28,14 +28,14 @@ export interface ClientResponse {
 }
 
 export interface ClientDto {
-  id?: string;
+  id: string;
   cpf: string;
   name: string;
   surname: string;
   dateOfBirth: Date;
   address: Address;
   contact: Contact;
-  billingAddress: Address;
+  billingAddress?: Address;
   created_at?: Date;
   updated_at?: Date;
 }

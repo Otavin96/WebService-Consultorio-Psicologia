@@ -48,6 +48,51 @@ export class SchedulingsTyperomRepository implements SchedulingsRepository {
     await this.schedulingsRepository.delete(id);
   }
 
+  async getAllSchedulingByClient(
+    clientId: string,
+    props: SearchInput
+  ): Promise<SearchOutput<SchedulingModel>> {
+    const validSort = this.sortableFields.includes(props.sort) || false;
+    const dirOps = ["asc", "desc"];
+    const validSortDir =
+      (props.sort_dir && dirOps.includes(props.sort_dir.toLowerCase())) ||
+      false;
+
+    const orderByField = validSort ? props.sort : "created_at";
+    const orderByDir = validSortDir ? props.sort_dir : "desc";
+
+    const where: any = {
+      client: {
+        id: clientId,
+      },
+    };
+
+    // Se tiver filtro, aplica no nome do cliente (ou outro campo desejado)
+    if (props.filter) {
+      where.client.name = ILike(`%${props.filter}%`);
+    }
+
+    const [schedulings, total] = await this.schedulingsRepository.findAndCount({
+      where,
+      relations: ["client"],
+      order: {
+        [orderByField]: orderByDir,
+      },
+      skip: (props.page - 1) * props.per_page,
+      take: props.per_page,
+    });
+
+    return {
+      items: schedulings,
+      per_page: props.per_page,
+      total,
+      current_page: props.page,
+      sort: props.sort,
+      sort_dir: props.sort_dir,
+      filter: props.filter,
+    };
+  }
+
   async search(props: SearchInput): Promise<SearchOutput<SchedulingModel>> {
     const validSort = this.sortableFields.includes(props.sort) || false;
     const dirOps = ["asc", "desc"];
@@ -56,7 +101,7 @@ export class SchedulingsTyperomRepository implements SchedulingsRepository {
       false;
     const orderByField = validSort ? props.sort : "created_at";
     const orderByDir = validSortDir ? props.sort_dir : "desc";
-    const [users, total] = await this.schedulingsRepository.findAndCount({
+    const [schedulings, total] = await this.schedulingsRepository.findAndCount({
       ...(props.filter && {
         where: {
           client: ILike(props.filter),
@@ -70,7 +115,7 @@ export class SchedulingsTyperomRepository implements SchedulingsRepository {
       take: props.per_page,
     });
     return {
-      items: users,
+      items: schedulings,
       per_page: props.per_page,
       total,
       current_page: props.page,

@@ -1,15 +1,18 @@
-import { StatusPermission } from "@/clients/domain/models/clients.model";
+import { StatusPermission } from "@/users/domain/models/users.model";
 
 export type GenerateAuthKeyProps = {
   access_token: string;
 };
 
 export type VerifyAuthKeyProps = {
-  client_id: string;
-  roles: StatusPermission
+  user_id: string;
+  roles: StatusPermission;
 };
 
 export interface AuthProvider {
-  generateAuthKey(client_id: string, roles: StatusPermission | undefined): GenerateAuthKeyProps;
+  generateAuthKey(
+    user_id: string,
+    roles: StatusPermission | undefined
+  ): GenerateAuthKeyProps;
   verifyAuthKey(token: string): VerifyAuthKeyProps;
 }

@@ -11,4 +11,6 @@ export type CreateConsultationProps = {
 };
 
 export interface ConsultationsRepository
-  extends RepositoryInterface<ConsultationModel, CreateConsultationProps> {}
+  extends RepositoryInterface<ConsultationModel, CreateConsultationProps> {
+  findAllByProfessionalId(professionalId: string): Promise<ConsultationModel[]>;
+}

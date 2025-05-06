@@ -15,13 +15,15 @@ export async function UpdateConsultationController(
 
   const { id } = dataValidation(GetConsultationSchemaParams, request.params);
 
-  const UpdateClientSchemaBody = z.object({
+  const UpdateConsultationSchemaBody = z.object({
     situation: z.nativeEnum(Status).optional(),
     previousConsultations: z
-      .object({
-        date: z.string(),
-        note: z.string(),
-      })
+      .array(
+        z.object({
+          date: z.string(),
+          note: z.string(),
+        })
+      )
       .optional(),
     currentQuery: z.string().optional(),
     patientAttention: z.string().optional(),
@@ -34,7 +36,7 @@ export async function UpdateConsultationController(
     currentQuery,
     patientAttention,
     scheduling,
-  } = dataValidation(UpdateClientSchemaBody, request.body);
+  } = dataValidation(UpdateConsultationSchemaBody, request.body);
 
   const updateConsutationUseCase: UpdateConsutationUseCase.UseCase =
     container.resolve("UpdateClientsUseCase");
@@ -48,5 +50,5 @@ export async function UpdateConsultationController(
     scheduling,
   });
 
-  response.status(201).json(consultation);
+  response.status(200).json(consultation);
 }

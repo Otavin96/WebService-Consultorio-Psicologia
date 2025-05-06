@@ -21,6 +21,7 @@ const AddressSchema = z.object({
 // Client schema
 const editClientSchema = z
   .object({
+    cpf: z.string().optional(),
     name: z.string().optional(),
     surname: z.string().optional(),
     dateOfBirth: z.coerce.date().optional(), // aceita string ou Date

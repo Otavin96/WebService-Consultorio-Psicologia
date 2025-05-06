@@ -1,11 +1,29 @@
 import styled from "styled-components";
-import { Input } from "../../components/Form/Input/Input";
+import { Input } from "../../../components/Form/Input/Input";
 
 export const Container = styled.div`
   margin: 10px auto;
   display: grid;
   max-width: 1200px;
   gap: 20px;
+`;
+
+export const Box = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 150px;
+`;
+
+export const DetailsSchedule = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding-left: 20px;
+  width: 550px;
+  height: 75px;
+  border: 1px solid black;
+  background-color: #fff;
+  border-radius: 3px;
 `;
 
 export const Form = styled.form`
@@ -118,8 +136,7 @@ export const PointsAtention = styled.div`
   textarea {
     height: 600px;
   }
-
-`
+`;
 
 export const FormDate = styled.div`
   display: flex;

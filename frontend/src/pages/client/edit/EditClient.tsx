@@ -8,7 +8,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { editClient, getClientById } from "../../../services/clientService";
 import { useEditClientForm } from "../schemas/editClientSchema";
 import { ClientDto } from "../../../tdos/client.dto";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const EditClient = () => {
   const location = useLocation();
@@ -31,36 +31,40 @@ const EditClient = () => {
     refetchInterval: 10,
   });
 
-  setValue("name", clientEdit?.name);
-  setValue("surname", clientEdit?.surname);
-  setValue("dateOfBirth", clientEdit?.dateOfBirth);
+  useEffect(() => {
+    if (clientEdit) {
+      setValue("name", clientEdit?.name);
+      setValue("surname", clientEdit?.surname);
+      setValue("dateOfBirth", clientEdit?.dateOfBirth);
 
-  setValue("address.cep", clientEdit?.address.cep);
-  setValue("address.publicPlace", clientEdit?.address.publicPlace);
-  setValue("address.numberHouse", clientEdit?.address.numberHouse);
-  setValue("address.neighborhood", clientEdit?.address.neighborhood);
-  setValue("address.state", clientEdit?.address.state);
-  setValue("address.city", clientEdit?.address.city);
+      setValue("address.cep", clientEdit?.address.cep);
+      setValue("address.publicPlace", clientEdit?.address.publicPlace);
+      setValue("address.numberHouse", clientEdit?.address.numberHouse);
+      setValue("address.neighborhood", clientEdit?.address.neighborhood);
+      setValue("address.state", clientEdit?.address.state);
+      setValue("address.city", clientEdit?.address.city);
 
-  setValue("billingAddress.cep", clientEdit?.billingAddress.cep);
-  setValue(
-    "billingAddress.publicPlace",
-    clientEdit?.billingAddress.publicPlace
-  );
-  setValue(
-    "billingAddress.numberHouse",
-    clientEdit?.billingAddress.numberHouse
-  );
-  setValue(
-    "billingAddress.neighborhood",
-    clientEdit?.billingAddress.neighborhood
-  );
-  setValue("billingAddress.state", clientEdit?.billingAddress.state);
-  setValue("billingAddress.city", clientEdit?.billingAddress.city);
+      setValue("billingAddress.cep", clientEdit?.billingAddress?.cep);
+      setValue(
+        "billingAddress.publicPlace",
+        clientEdit?.billingAddress?.publicPlace
+      );
+      setValue(
+        "billingAddress.numberHouse",
+        clientEdit?.billingAddress?.numberHouse
+      );
+      setValue(
+        "billingAddress.neighborhood",
+        clientEdit?.billingAddress?.neighborhood
+      );
+      setValue("billingAddress.state", clientEdit?.billingAddress?.state);
+      setValue("billingAddress.city", clientEdit?.billingAddress?.city);
 
-  setValue("contact.phone", clientEdit?.contact.phone);
-  setValue("contact.whatsApp", clientEdit?.contact.whatsApp);
-  setValue("contact.email", clientEdit?.contact.email);
+      setValue("contact.phone", clientEdit?.contact.phone);
+      setValue("contact.whatsApp", clientEdit?.contact.whatsApp);
+      setValue("contact.email", clientEdit?.contact.email);
+    }
+  }, [clientEdit, setValue]);
 
   const mutation = useMutation({
     mutationFn: async (client: ClientDto) => {
@@ -78,11 +82,12 @@ const EditClient = () => {
     },
   });
 
-  const onSubmit = (client: ClientDto): void => {
+  const onSubmit = (client: any): void => {
     console.log("Componente onSubmit chamado");
     console.log("Dados do formulário: ", client);
     try {
       mutation.mutate(client);
+      reset();
     } catch (error) {
       console.log("Erro ao cadastrar cliente", error);
     }
@@ -232,14 +237,14 @@ const EditClient = () => {
               <Select label="Estado*">
                 <option>Estado</option>
                 <option selected {...register("billingAddress.state")}>
-                  {clientEdit?.billingAddress.state}
+                  {clientEdit?.billingAddress?.state}
                 </option>
                 helperText={errors.billingAddress?.state?.message}
               </Select>
               <Select label="Cidade*">
                 <option>Cidade</option>
                 <option selected {...register("billingAddress.city")}>
-                  {clientEdit?.billingAddress.city}
+                  {clientEdit?.billingAddress?.city}
                 </option>
                 helperText={errors.billingAddress?.city?.message}
               </Select>

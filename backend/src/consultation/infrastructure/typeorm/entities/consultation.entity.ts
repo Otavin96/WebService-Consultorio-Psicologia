@@ -3,11 +3,13 @@ import {
   Status,
 } from "@/consultation/domain/models/consultation.model";
 import { Scheduling } from "@/scheduling/infrastructure/typeorm/entities/scheduling.entity";
+import { User } from "@/users/infrastructure/typeorm/entities/users.entitty";
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -37,6 +39,10 @@ export class Consultation implements ConsultationModel {
   })
   @JoinColumn({ name: "scheduling_id" })
   scheduling: Scheduling;
+
+  @ManyToOne(() => User, (user) => user.consultation, { nullable: false })
+  @JoinColumn({ name: "professional" })
+  professional: User;
 
   @CreateDateColumn()
   created_at: Date;

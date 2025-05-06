@@ -23,3 +23,9 @@ export const ContentRight = styled.div`
 export const Date = styled.p`
   font-weight: bold;
 `;
+
+export const Logout = styled.p`
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+`;

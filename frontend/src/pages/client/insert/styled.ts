@@ -52,7 +52,7 @@ export const FormControl = styled.div`
 
 export const FormControlCep = styled(FormControl)``;
 
-export const BtnSearchCep = styled.button`
+export const BtnSearchCep = styled.a`
   font-size: 20px;
   border: none;
   background-color: #fff;

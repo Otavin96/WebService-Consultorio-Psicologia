@@ -7,6 +7,7 @@ import { DeleteSchedulingUseCase } from "@/scheduling/application/usecases/delet
 import { GetSchedulingUseCase } from "@/scheduling/application/usecases/get-scheduling.usecase";
 import { SearchSchedulingUseCase } from "@/scheduling/application/usecases/search.scheduling-usecase";
 import { UpdateSchedulingUseCase } from "@/scheduling/application/usecases/update-scheduling-usecase";
+import { GetAllSchedulingByClientUseCase } from "@/scheduling/application/usecases/get-scheduling-all-by-client.scheduling-usecase.";
 
 container.registerSingleton(
   "SchedulingsRepository",
@@ -31,6 +32,11 @@ container.registerSingleton(
 container.registerSingleton(
   "GetSchedulingsUseCase",
   GetSchedulingUseCase.UseCase
+);
+
+container.registerSingleton(
+  "GetAllSchedulingByClientUseCase",
+  GetAllSchedulingByClientUseCase.UseCase
 );
 
 container.registerSingleton(

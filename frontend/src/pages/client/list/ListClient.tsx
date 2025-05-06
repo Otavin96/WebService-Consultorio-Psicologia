@@ -2,16 +2,24 @@ import { FaUserEdit } from "react-icons/fa";
 import * as L from "./styled";
 import { IoCalendar } from "react-icons/io5";
 import { RiDeleteBinFill } from "react-icons/ri";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Pagination from "../../../components/pagination/Pagination";
 
 import { useQuery } from "@tanstack/react-query";
 import { fetchClients } from "../../../services/clientService";
 
 const ListClient = () => {
+  const [queryParams] = useSearchParams();
+
+  const per_page = queryParams.get("per_page")
+    ? Number(queryParams.get("per_page"))
+    : 5;
+
+  const page = queryParams.get("page") ? Number(queryParams.get("page")) : 1;
+
   const { data: clientsResponse, isPending } = useQuery({
-    queryKey: ["clients"],
-    queryFn: fetchClients,
+    queryKey: ["clients", per_page, page],
+    queryFn: () => fetchClients(per_page, page),
   });
 
   if (isPending) return <h1>Loading</h1>;
@@ -34,10 +42,10 @@ const ListClient = () => {
           </L.Tr>
         </L.Thead>
         <L.Tbody>
-          {clientsResponse?.length === 0 && (
+          {clientsResponse?.items?.length === 0 && (
             <L.TdNull colSpan={6}>Lista de clientes vazia</L.TdNull>
           )}
-          {clientsResponse?.map((client, index) => (
+          {clientsResponse?.items?.map((client, index) => (
             <L.Tr key={client.id}>
               <L.Td>{index + 1}</L.Td>
               <L.Td>{client.name}</L.Td>
@@ -52,14 +60,15 @@ const ListClient = () => {
               <L.Td>{client.dateOfBirth}</L.Td>
               <L.Td>
                 <L.Span>
-                  {/* <L.LinkIcon to="/editar/cliente"> */}
                   <L.LinkIcon to={"/editar/cliente"} state={client.id}>
                     <FaUserEdit />
                   </L.LinkIcon>
                   <L.LinkIcon to="#">
                     <RiDeleteBinFill />
                   </L.LinkIcon>
-                  <L.LinkIcon to="/inserir/agendamento">
+                  <L.LinkIcon
+                    to={`/listar/agendamento/${client.id}?name=${encodeURIComponent(client.name)}`}
+                  >
                     <IoCalendar />
                   </L.LinkIcon>
                 </L.Span>
@@ -68,7 +77,12 @@ const ListClient = () => {
           ))}
         </L.Tbody>
       </L.Table>
-      <Pagination />
+      <Pagination
+        current_page={page}
+        last_page={Number(clientsResponse?.last_page)}
+        per_page={per_page}
+        total={Number(clientsResponse?.total)}
+      />
     </L.Container>
   );
 };

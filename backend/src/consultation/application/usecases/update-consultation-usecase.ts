@@ -7,11 +7,11 @@ import { ConsultationsRepository } from "@/consultation/repositories/consultatio
 export namespace UpdateConsutationUseCase {
   export type Input = {
     id: string;
-    situation: Status;
-    previousConsultations: { date: string; note: string }[];
-    currentQuery: string;
-    patientAttention: string;
-    scheduling: Scheduling;
+    situation?: Status;
+    previousConsultations?: { date: string; note: string }[];
+    currentQuery?: string;
+    patientAttention?: string;
+    scheduling?: Scheduling;
   };
 
   export type Output = ConsultationsOutput;
@@ -30,8 +30,11 @@ export namespace UpdateConsutationUseCase {
         consultation.situation = input.situation;
       }
 
-      if (input.previousConsultations) {
-        consultation.previousConsultations = input.previousConsultations;
+      if (input.previousConsultations?.length) {
+        consultation.previousConsultations = [
+          ...(consultation.previousConsultations || []),
+          ...input.previousConsultations,
+        ];
       }
 
       if (input.currentQuery) {

@@ -6,43 +6,88 @@ import * as I from "./styled";
 import { Button } from "../../../components/Form/Button/Button";
 import { ClientDto } from "../../../tdos/client.dto";
 import { insertClient } from "../../../services/clientService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePostClientForm } from "../schemas/postClientSchema";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { fetchCitiesByState } from "../../../helpers/fetchCitiesByState";
+import { fetchApiBrasil } from "../../../helpers/brasilAPI";
+import { Controller } from "react-hook-form";
 
 const InsertClient = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    getValues,
+    watch,
     setValue,
-    reset, // Reset form after submit
+    getValues,
+    control,
+    reset,
   } = usePostClientForm();
 
+  const nav = useNavigate();
   const [sameAddress, setSameAddress] = useState(false);
+
+  const [cities, setCities] = useState<string[]>([]);
+  const [billingCities, setBillingCities] = useState<string[]>([]);
+
+  const selectedState = watch("address.state");
+  const selectedBillingState = watch("billingAddress.state");
+
+  const searchDataZipCode = async (cep: string) => {
+    try {
+      const data = await fetchApiBrasil(cep);
+
+      console.log(data); // Verifique a estrutura de `data` aqui
+
+      if (data) {
+        // Atualiza os campos do formulário com os dados retornados
+        setValue("address.publicPlace", data.street || ""); // Verifique se a "street" está vazia
+        setValue("address.neighborhood", data.neighborhood || ""); // Verifique se o "neighborhood" está vazio
+        setValue("address.state", data.state || ""); // Estado
+        setValue("address.city", data.city || ""); // Cidade
+      } else {
+        toast.error("CEP não encontrado.");
+        return;
+      }
+    } catch (err) {
+      toast.error("Erro ao buscar CEP.");
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedState) {
+      fetchCitiesByState(selectedState).then(setCities);
+    }
+  }, [selectedState]);
+
+  useEffect(() => {
+    if (selectedBillingState) {
+      fetchCitiesByState(selectedBillingState).then(setBillingCities);
+    }
+  }, [selectedBillingState]);
 
   const mutation = useMutation({
     mutationFn: async (client: ClientDto) => {
-      console.log("Enviando dados ao backend: ", client); // Diagnóstico
-      return insertClient(client); // Certifique-se de que insertClient retorna uma promise
+      return insertClient(client);
     },
-    onSuccess: (data) => {
-      console.log("Cliente cadastrado com sucesso", data);
-      reset(); // Limpa o formulário após sucesso
+    onSuccess: () => {
+      toast.success("Cadastro realizado com sucesso!");
+
+      setTimeout(() => {
+        nav("/gestao/clientes");
+      }, 5000);
     },
-    onError: (error) => {
-      console.log("Erro ao cadastrar cliente", error);
+    onError: () => {
+      toast.error("Erro ao cadastrar cliente");
+      reset();
     },
   });
 
   const onSubmit = (data: ClientDto) => {
-    console.log("Componente onSubmit chamado");
-    console.log("Dados do formulário: ", data);
-    try {
-      mutation.mutate(data);
-    } catch (error) {
-      console.log("Erro ao cadastrar cliente", error);
-    }
+    mutation.mutate(data);
   };
 
   const handleCopyAddress = () => {
@@ -62,6 +107,7 @@ const InsertClient = () => {
       <I.Title>Inserir Cliente</I.Title>
       <I.Form onSubmit={handleSubmit(onSubmit, onError)}>
         <I.LeftSide>
+          {/* Dados do Cliente */}
           <I.DataClient>
             <Input
               {...register("cpf")}
@@ -89,6 +135,7 @@ const InsertClient = () => {
             />
           </I.DataClient>
 
+          {/* Endereço Residencial */}
           <I.AddressClient>
             <I.SubTitle>Endereço</I.SubTitle>
 
@@ -100,7 +147,9 @@ const InsertClient = () => {
                 helperText={errors.address?.cep?.message}
               />
               <I.BtnSearchCep>
-                <FaMapMarkerAlt />
+                <FaMapMarkerAlt
+                  onClick={() => searchDataZipCode(getValues("address.cep"))}
+                />
               </I.BtnSearchCep>
             </I.FormControlCep>
 
@@ -126,21 +175,39 @@ const InsertClient = () => {
                 label="Bairro*"
                 helperText={errors.address?.neighborhood?.message}
               />
-              <Select label="Estado*">
-                <option value="">Estado</option>
-                <option {...register("address.state")} value="SC">
-                  Santa Catarina
-                </option>
-              </Select>
-              <Select label="Cidade*">
-                <option value="">Cidade</option>
-                <option {...register("address.city")} value="Fraiburgo">
-                  Fraiburgo
-                </option>
-              </Select>
+              <Controller
+                name="address.state" // O nome do campo no seu formulário
+                control={control} // Controlador do React Hook Form
+                defaultValue="" // Valor inicial (pode ser o valor retornado pela API)
+                render={({ field }) => (
+                  <Select label="Estado*" {...field}>
+                    <option value="">Estado</option>
+                    <option value="SC">Santa Catarina</option>
+                    <option value="RS">Rio Grande do Sul</option>
+                    <option value="PR">Paraná</option>
+                    {/* Adicione mais estados conforme necessário */}
+                  </Select>
+                )}
+              />
+              <Controller
+                name="address.city"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <Select label="Cidade*" {...field}>
+                    <option value="">Cidade</option>
+                    {cities.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              />
             </I.FormControl>
           </I.AddressClient>
 
+          {/* Endereço de Cobrança */}
           <I.AddressClient>
             <I.Header>
               <I.SubTitle>Endereço de Cobrança</I.SubTitle>
@@ -184,28 +251,40 @@ const InsertClient = () => {
             </I.FormControl>
 
             <I.FormControl>
-              <Input
-                {...register("billingAddress.neighborhood")}
-                type="text"
-                label="Bairro*"
-                helperText={errors.billingAddress?.neighborhood?.message}
+              <Controller
+                name="billingAddress.state" // O nome do campo no seu formulário
+                control={control} // Controlador do React Hook Form
+                defaultValue="" // Valor inicial (pode ser o valor retornado pela API)
+                render={({ field }) => (
+                  <Select label="Estado*" {...field}>
+                    <option value="">Estado</option>
+                    <option value="SC">Santa Catarina</option>
+                    <option value="RS">Rio Grande do Sul</option>
+                    <option value="PR">Paraná</option>
+                    {/* Adicione mais estados conforme necessário */}
+                  </Select>
+                )}
               />
-              <Select label="Estado*">
-                <option value="">Estado</option>
-                <option {...register("billingAddress.state")} value="SC">
-                  Santa Catarina
-                </option>
-              </Select>
-              <Select label="Cidade*">
-                <option value="">Cidade</option>
-                <option {...register("billingAddress.city")} value="Fraiburgo">
-                  Fraiburgo
-                </option>
-              </Select>
+              <Controller
+                name="billingAddress.city"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <Select label="Cidade*" {...field}>
+                    <option value="">Cidade</option>
+                    {cities.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              />
             </I.FormControl>
           </I.AddressClient>
         </I.LeftSide>
 
+        {/* Dados de Contato */}
         <I.RightSide>
           <I.SubTitle>Contato</I.SubTitle>
           <I.Contact>

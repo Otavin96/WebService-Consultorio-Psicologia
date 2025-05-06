@@ -33,17 +33,31 @@ export class ConsultationTypeormRepository implements ConsultationsRepository {
   }
 
   async update(model: ConsultationModel): Promise<ConsultationModel> {
-    await this._get(model.id);
+    await this._get(model.id); // Verifica se a consulta existe
 
-    await this.consultationsRepository.update(model.id, model);
+    // Utiliza 'save' para garantir que todas as propriedades da entidade sejam atualizadas corretamente
+    await this.consultationsRepository.save(model); // save faz update se a entidade já existir
 
-    return model;
+    // Retorna a versão persistida da consulta após a atualização
+    return await this._get(model.id);
   }
 
   async delete(id: string): Promise<void> {
     await this._get(id);
 
     await this.consultationsRepository.delete(id);
+  }
+
+  async findAllByProfessionalId(
+    professionalId: string
+  ): Promise<ConsultationModel[]> {
+    return this.consultationsRepository.find({
+      where: { professional: { id: professionalId } },
+      relations: {
+        scheduling: { client: true },
+      },
+      order: { created_at: "DESC" },
+    });
   }
 
   async search(props: SearchInput): Promise<SearchOutput<ConsultationModel>> {

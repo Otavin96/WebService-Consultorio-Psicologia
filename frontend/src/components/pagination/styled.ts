@@ -5,7 +5,7 @@ export const Pagination = styled.div`
   display: flex;
   flex-direction: row;
   height: 45px;
-  width: 400px;
+  width: 800px;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -26,27 +26,15 @@ export const Page = styled.div`
   display: flex;
   justify-content: center;
   height: 45px;
-  width: 300px;
+  min-width: 100px;
+  background-color: #ddd;
+  border-radius: 20px;
 `;
 
-export const BtnOne = styled.button`
+export const Btn = styled.button`
   border: none;
   width: 50px;
   height: 100%;
   cursor: pointer;
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
-  background-color: #ddd;
-`;
-
-export const BtnEnd = styled(BtnOne)`
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-`;
-
-export const Btn = styled(BtnOne)`
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  background-color: transparent;
 `;
