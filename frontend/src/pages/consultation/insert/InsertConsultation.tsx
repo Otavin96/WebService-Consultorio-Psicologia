@@ -4,7 +4,7 @@ import * as I from "./styled";
 import { Input } from "../../../components/Form/Input/Input";
 import { Select } from "../../../components/Form/Select/Select";
 import { Button } from "../../../components/Form/Button/Button";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getClientById } from "../../../services/clientService";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -12,11 +12,15 @@ import { getSchedulingById } from "../../../services/schedulingService";
 import { ConsultationDto } from "../../../tdos/consultation.dto";
 import { insertConsultation } from "../../../services/consultationService";
 import { usePostConsultationForm } from "../schemas/postConsultationSchema";
-import { useForm } from "react-hook-form";
+import { useAuth } from "../../../hooks/Auth/useAuth";
+import { toast } from "react-toastify";
+import { SchedulingDto } from "../../../tdos/scheduling.dto";
 
 const InsertConsultation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { schedulingId, clientId } = location.state;
+  const { user } = useAuth();
 
   const newDate = new Date();
   const dateActual = newDate.toLocaleDateString("pt-BR");
@@ -31,19 +35,18 @@ const InsertConsultation = () => {
     reset,
   } = usePostConsultationForm();
 
-  const { data: client } = useQuery({
+  const { data: client, refetch } = useQuery({
     queryKey: ["client", clientId],
     queryFn: () => getClientById(clientId),
   });
 
-  const { data: scheduling } = useQuery({
-    queryKey: ["scheduling", clientId],
+  const { data: scheduling } = useQuery<SchedulingDto>({
+    queryKey: ["scheduling", schedulingId],
     queryFn: () => getSchedulingById(schedulingId),
   });
 
   const mutation = useMutation({
     mutationFn: async (consultation: ConsultationDto) => {
-      console.log(consultation.id);
       await insertConsultation({
         situation,
         previousConsultations: {
@@ -52,8 +55,19 @@ const InsertConsultation = () => {
         },
         currentQuery: consultation.currentQuery,
         patientAttention: consultation.patientAttention,
-        scheduling: consultation.id,
+        scheduling: consultation.scheduling,
+        professional: consultation.professional,
       });
+    },
+    onSuccess: () => {
+      toast.success("Consulta realizada com sucesso!");
+      refetch();
+      navigate(`/listar/agendamento/${client?.id}`);
+    },
+
+    onError: () => {
+      refetch();
+      toast.error("Consulta não concluida!");
     },
   });
 
@@ -91,11 +105,21 @@ const InsertConsultation = () => {
         <I.Title>Consulta</I.Title>
         <I.DetailsSchedule>
           <p>
-            Data da Consulta: <strong>{scheduling?.date}</strong>
+            Data da Consulta:{" "}
+            <strong>
+              {scheduling?.date
+                ? new Date(scheduling.date).toLocaleDateString("pt-BR")
+                : "Data indisponível"}
+            </strong>
           </p>
 
           <p>
-            Data do Agendamento: <strong>{scheduling?.date}</strong>
+            Data do Agendamento:{" "}
+            <strong>
+              {scheduling?.created_at
+                ? new Date(scheduling.created_at).toLocaleDateString("pt-BR")
+                : "Data indisponível"}
+            </strong>
           </p>
           <p>
             Horário da Consulta: <strong>{scheduling?.time}</strong>
@@ -106,7 +130,8 @@ const InsertConsultation = () => {
         </I.DetailsSchedule>
       </I.Box>
       <I.Form onSubmit={handleSubmit(onSubmit, onError)}>
-        <Input {...register("id")} type="hidden" value={schedulingId} />
+        <Input {...register("scheduling")} type="hidden" value={schedulingId} />
+        <Input {...register("professional")} type="hidden" value={user?.id} />
         <I.LeftSide>
           <I.DataClient>
             <Input

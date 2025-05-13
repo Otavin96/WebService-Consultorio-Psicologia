@@ -4,12 +4,17 @@ import { IoCalendar } from "react-icons/io5";
 import { RiDeleteBinFill } from "react-icons/ri";
 import { Link, useSearchParams } from "react-router-dom";
 import Pagination from "../../../components/pagination/Pagination";
-
-import { useQuery } from "@tanstack/react-query";
-import { fetchClients } from "../../../services/clientService";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { deleteClient, fetchClients } from "../../../services/clientService";
+import { useState } from "react";
+import Modal from "../../../components/Modal/Modal";
+import { DataProps } from "../../../tdos/data.dto";
+import { toast } from "react-toastify";
 
 const ListClient = () => {
   const [queryParams] = useSearchParams();
+  const [modal, setModal] = useState(false);
+  const [dataClient, setDataClient] = useState<DataProps>();
 
   const per_page = queryParams.get("per_page")
     ? Number(queryParams.get("per_page"))
@@ -17,15 +22,52 @@ const ListClient = () => {
 
   const page = queryParams.get("page") ? Number(queryParams.get("page")) : 1;
 
-  const { data: clientsResponse, isPending } = useQuery({
+  const {
+    data: clientsResponse,
+    isPending,
+    refetch,
+  } = useQuery({
     queryKey: ["clients", per_page, page],
     queryFn: () => fetchClients(per_page, page),
   });
+
+  const mutation = useMutation({
+    mutationKey: ["clients"],
+    mutationFn: async (id: string | undefined) => {
+      await deleteClient(id);
+    },
+    onSuccess: () => {
+      toast.success("Cliente removido com sucesso!");
+      refetch();
+    },
+    onError: () => {
+      toast.error("Ocorreu um erro ao tentar remover o cliente!");
+    },
+  });
+
+  const handleModal = (id: string, name: string) => {
+    const data: DataProps = { id, name };
+    setModal(true);
+    setDataClient(data);
+  };
+
+  const onConfirm = (id: string | undefined) => {
+    mutation.mutate(id);
+  };
 
   if (isPending) return <h1>Loading</h1>;
 
   return (
     <L.Container>
+      {modal && (
+        <Modal
+          title="Exclusão de cliente"
+          message={`Deseja realmente excluir o cliente ${dataClient?.name}`}
+          setModal={setModal}
+          onConfirm={() => onConfirm(dataClient?.id)}
+          id={dataClient?.id}
+        />
+      )}
       <L.Title>Gestão de Clientes</L.Title>
       <Link to="/inserir/cliente">
         <L.BtnInsertClient>Inserir cliente</L.BtnInsertClient>
@@ -63,11 +105,17 @@ const ListClient = () => {
                   <L.LinkIcon to={"/editar/cliente"} state={client.id}>
                     <FaUserEdit />
                   </L.LinkIcon>
-                  <L.LinkIcon to="#">
+                  <L.LinkIcon
+                    onClick={() => handleModal(client.id, client.name)}
+                    to={"#"}
+                  >
                     <RiDeleteBinFill />
                   </L.LinkIcon>
                   <L.LinkIcon
-                    to={`/listar/agendamento/${client.id}?name=${encodeURIComponent(client.name)}`}
+                    to={`/listar/agendamento/${client.id}`}
+                    onClick={() =>
+                      localStorage.setItem("client_name", client.name)
+                    }
                   >
                     <IoCalendar />
                   </L.LinkIcon>

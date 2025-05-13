@@ -4,6 +4,7 @@ import { Status } from "@/consultation/domain/models/consultation.model";
 import { Scheduling } from "@/scheduling/infrastructure/typeorm/entities/scheduling.entity";
 import { ConsultationsOutput } from "../dtos/consultation-output.dto";
 import { ConsultationsRepository } from "@/consultation/repositories/consultation.repository";
+import { User } from "@/users/infrastructure/typeorm/entities/users.entitty";
 
 export namespace CreateConsultationUseCase {
   export type Input = {
@@ -12,6 +13,7 @@ export namespace CreateConsultationUseCase {
     currentQuery: string;
     patientAttention: string;
     scheduling: Scheduling;
+    professional: User;
   };
 
   export type Output = ConsultationsOutput;
@@ -29,7 +31,8 @@ export namespace CreateConsultationUseCase {
         !input.previousConsultations ||
         !input.currentQuery ||
         !input.patientAttention ||
-        !input.scheduling
+        !input.scheduling ||
+        !input.professional
       ) {
         throw new BadRequestError("Input data not provedid or invalid");
       }

@@ -9,19 +9,24 @@ export const insertScheduling = async (
 };
 
 export const fetchAllSchedulingByClient = async (
-  clientId: string,
+  clientId: string | undefined,
   per_page: number,
   page: number
 ): Promise<PaginationResponse<SchedulingDto>> => {
   const response = await api.get<PaginationResponse<SchedulingDto>>(
     `/scheduling/client/${clientId}/?page=${page}&per_page=${per_page}`
   );
+  return response.data;
+};
+
+export const getSchedulingById = async (id: string): Promise<SchedulingDto> => {
+  const response = await api.get(`/scheduling/${id}`);
 
   return response.data;
 };
 
-export const getSchedulingById = async (id: string): Promise<void> => {
-  const response = await api.get(`/scheduling/${id}`);
-
-  return response.data;
+export const deleteScheduling = async (
+  id: string | undefined
+): Promise<void> => {
+  await api.delete(`/scheduling/${id}`);
 };

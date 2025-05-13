@@ -10,6 +10,7 @@ export interface SchedulingDto {
   id?: string;
   client: {
     id: string;
+    name: string;
     address: {
       cep: string;
       publicPlace: string;
@@ -27,4 +28,5 @@ export interface SchedulingDto {
   date: Date;
   time: string;
   observations: string;
+  created_at: Date;
 }

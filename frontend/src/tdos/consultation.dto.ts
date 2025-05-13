@@ -22,6 +22,7 @@ export interface ConsultationDto {
   currentQuery: string;
   patientAttention: string;
   scheduling: string | undefined;
+  professional: string | undefined;
   created_at?: Date;
   updated_at?: Date;
 }

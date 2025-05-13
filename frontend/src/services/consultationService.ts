@@ -6,3 +6,9 @@ export const insertConsultation = async (consultation: ConsultationDto) => {
 
   return response.data.items;
 };
+
+export const getConsultation = async (id: string) => {
+  const response = await api.get(`/consultation/${id}`);
+  console.log(response.data);
+  return response.data;
+};

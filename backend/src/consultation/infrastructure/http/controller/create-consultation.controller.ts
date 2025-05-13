@@ -18,6 +18,7 @@ export async function CreateConsultationController(
     currentQuery: z.string(),
     patientAttention: z.string(),
     scheduling: z.string(),
+    professional: z.string(),
   });
 
   const {
@@ -26,6 +27,7 @@ export async function CreateConsultationController(
     currentQuery,
     patientAttention,
     scheduling,
+    professional,
   } = dataValidation(CreateConsultationSchemaBody, request.body);
 
   const createConsultationUseCase: CreateConsultationUseCase.UseCase =
@@ -37,6 +39,7 @@ export async function CreateConsultationController(
     currentQuery,
     patientAttention,
     scheduling,
+    professional,
   });
 
   response.status(201).json(consutation);

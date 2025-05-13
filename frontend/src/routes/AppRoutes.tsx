@@ -11,10 +11,25 @@ import Register from "../pages/Auth/Register";
 import { AuthContext } from "../Context/AuthContext";
 import LayoutWithNavbar from "../components/navbar/LayoutWithNavbar";
 import Login from "../pages/Auth/Login";
+import { StatusPermission } from "../tdos/user.dto";
+import Unauthorized from "../pages/Unauthorized/Unauthorized";
 
-const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-  const { auth } = useContext(AuthContext);
-  return auth ? children : <Navigate to="/login" />;
+const PrivateRoute = ({
+  children,
+  requiredRoles,
+}: {
+  children: JSX.Element;
+  requiredRoles: StatusPermission[];
+}) => {
+  const { auth, user } = useContext(AuthContext);
+
+  if (!auth) return <Navigate to="/login" />;
+
+  const hasPermission = requiredRoles.includes(user?.roles as StatusPermission);
+
+  if (!hasPermission) return <Navigate to="/unauthorized" />;
+
+  return children;
 };
 
 const AppRoutes = () => {
@@ -24,25 +39,88 @@ const AppRoutes = () => {
         {/* Rotas privadas com layout que inclui Navbar */}
         <Route
           element={
-            <PrivateRoute>
+            <PrivateRoute
+              requiredRoles={[
+                StatusPermission.SECRETARIA,
+                StatusPermission.PROFISSIONAL_SAUDE,
+              ]}
+            >
               <LayoutWithNavbar />
             </PrivateRoute>
           }
         >
           <Route path="/" element={<Home />} />
-          <Route path="/gestao/clientes" element={<ListClient />} />
-          <Route path="/inserir/cliente" element={<InsertClient />} />
-          <Route path="/editar/cliente" element={<EditClient />} />
+          <Route
+            path="/gestao/clientes"
+            element={
+              <PrivateRoute
+                requiredRoles={[
+                  StatusPermission.SECRETARIA,
+                  StatusPermission.PROFISSIONAL_SAUDE,
+                ]}
+              >
+                <ListClient />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/inserir/cliente"
+            element={
+              <PrivateRoute
+                requiredRoles={[
+                  StatusPermission.SECRETARIA,
+                  StatusPermission.PROFISSIONAL_SAUDE,
+                ]}
+              >
+                <InsertClient />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/editar/cliente"
+            element={
+              <PrivateRoute
+                requiredRoles={[
+                  StatusPermission.SECRETARIA,
+                  StatusPermission.PROFISSIONAL_SAUDE,
+                ]}
+              >
+                <EditClient />
+              </PrivateRoute>
+            }
+          />
 
           <Route path="/listar/agendamento/:id" element={<ListScheduling />} />
-          <Route path="/inserir/agendamento" element={<InsertScheduling />} />
+          <Route
+            path="/inserir/agendamento"
+            element={
+              <PrivateRoute
+                requiredRoles={[
+                  StatusPermission.SECRETARIA,
+                  StatusPermission.PROFISSIONAL_SAUDE,
+                ]}
+              >
+                <InsertScheduling />
+              </PrivateRoute>
+            }
+          />
 
-          <Route path="/inserir/consulta" element={<InsertConsultation />} />
+          <Route
+            path="/inserir/consulta"
+            element={
+              <PrivateRoute
+                requiredRoles={[StatusPermission.PROFISSIONAL_SAUDE]}
+              >
+                <InsertConsultation />
+              </PrivateRoute>
+            }
+          />
         </Route>
 
         {/* Rotas públicas (sem Navbar) */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
     </BrowserRouter>
   );

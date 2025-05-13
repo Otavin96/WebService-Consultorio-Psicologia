@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchCitiesByState } from "../../../helpers/fetchCitiesByState";
 import { fetchApiBrasil } from "../../../helpers/brasilAPI";
 import { Controller } from "react-hook-form";
+import { states } from "../../../util/State";
 
 const InsertClient = () => {
   const {
@@ -35,18 +36,26 @@ const InsertClient = () => {
   const selectedState = watch("address.state");
   const selectedBillingState = watch("billingAddress.state");
 
-  const searchDataZipCode = async (cep: string) => {
+  const searchDataZipCode = async (cep: string, typeAddress: string) => {
     try {
       const data = await fetchApiBrasil(cep);
 
-      console.log(data); // Verifique a estrutura de `data` aqui
-
       if (data) {
-        // Atualiza os campos do formulário com os dados retornados
-        setValue("address.publicPlace", data.street || ""); // Verifique se a "street" está vazia
-        setValue("address.neighborhood", data.neighborhood || ""); // Verifique se o "neighborhood" está vazio
-        setValue("address.state", data.state || ""); // Estado
-        setValue("address.city", data.city || ""); // Cidade
+        if (typeAddress === "address") {
+          // Atualiza os campos do formulário com os dados retornados
+          setValue("address.publicPlace", data.street || ""); // Verifique se a "street" está vazia
+          setValue("address.neighborhood", data.neighborhood || ""); // Verifique se o "neighborhood" está vazio
+          setValue("address.state", data.state || ""); // Estado
+          setValue("address.city", data.city || ""); // Cidade
+        }
+
+        if (typeAddress === "billingAddress") {
+          // Atualiza os campos do formulário com os dados retornados
+          setValue("billingAddress.publicPlace", data.street || ""); // Verifique se a "street" está vazia
+          setValue("billingAddress.neighborhood", data.neighborhood || ""); // Verifique se o "neighborhood" está vazio
+          setValue("billingAddress.state", data.state || ""); // Estado
+          setValue("billingAddress.city", data.city || ""); // Cidade
+        }
       } else {
         toast.error("CEP não encontrado.");
         return;
@@ -75,10 +84,7 @@ const InsertClient = () => {
     },
     onSuccess: () => {
       toast.success("Cadastro realizado com sucesso!");
-
-      setTimeout(() => {
-        nav("/gestao/clientes");
-      }, 5000);
+      nav("/gestao/clientes");
     },
     onError: () => {
       toast.error("Erro ao cadastrar cliente");
@@ -148,7 +154,9 @@ const InsertClient = () => {
               />
               <I.BtnSearchCep>
                 <FaMapMarkerAlt
-                  onClick={() => searchDataZipCode(getValues("address.cep"))}
+                  onClick={() =>
+                    searchDataZipCode(getValues("address.cep"), "address")
+                  }
                 />
               </I.BtnSearchCep>
             </I.FormControlCep>
@@ -182,10 +190,11 @@ const InsertClient = () => {
                 render={({ field }) => (
                   <Select label="Estado*" {...field}>
                     <option value="">Estado</option>
-                    <option value="SC">Santa Catarina</option>
-                    <option value="RS">Rio Grande do Sul</option>
-                    <option value="PR">Paraná</option>
-                    {/* Adicione mais estados conforme necessário */}
+                    {states.map((state) => (
+                      <option key={state.acronym} value={state.acronym}>
+                        {state.name}
+                      </option>
+                    ))}
                   </Select>
                 )}
               />
@@ -231,7 +240,14 @@ const InsertClient = () => {
                 helperText={errors.billingAddress?.cep?.message}
               />
               <I.BtnSearchCep>
-                <FaMapMarkerAlt />
+                <FaMapMarkerAlt
+                  onClick={() =>
+                    searchDataZipCode(
+                      getValues("billingAddress.cep"),
+                      "billingAddress"
+                    )
+                  }
+                />
               </I.BtnSearchCep>
             </I.FormControlCep>
 
@@ -251,6 +267,12 @@ const InsertClient = () => {
             </I.FormControl>
 
             <I.FormControl>
+              <Input
+                {...register("billingAddress.neighborhood")}
+                type="text"
+                label="Bairro*"
+                helperText={errors.billingAddress?.neighborhood?.message}
+              />
               <Controller
                 name="billingAddress.state" // O nome do campo no seu formulário
                 control={control} // Controlador do React Hook Form
@@ -272,7 +294,7 @@ const InsertClient = () => {
                 render={({ field }) => (
                   <Select label="Cidade*" {...field}>
                     <option value="">Cidade</option>
-                    {cities.map((city) => (
+                    {billingCities.map((city) => (
                       <option key={city} value={city}>
                         {city}
                       </option>

@@ -3,7 +3,6 @@ import { Status } from "../../../tdos/consultation.dto";
 import { useZodForm } from "../../../hooks/Form/useZodForm";
 
 export const postConsultationSchema = z.object({
-  id: z.string(),
   client: z.object({
     id: z.string(),
     cpf: z.string(),
@@ -28,6 +27,7 @@ export const postConsultationSchema = z.object({
   currentQuery: z.string(),
   patientAttention: z.string(),
   scheduling: z.coerce.string(),
+  professional: z.string(),
 });
 
 export const usePostConsultationForm = () => useZodForm(postConsultationSchema);
