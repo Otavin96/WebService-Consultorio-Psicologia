@@ -1,9 +1,15 @@
+import { Link } from "react-router-dom";
+import * as S from "./styled";
+
 const Unauthorized = () => {
   return (
-    <div>
-      <h1>403 - Acesso Negado</h1>
-      <p>Você não tem permissão para acessar esta página.</p>
-    </div>
+    <S.Container>
+      <S.Card>
+        <S.Title>403 - Acesso Negado</S.Title>
+        <p>Você não tem permissão para acessar esta página.</p>
+        <Link to={"/"}>Voltar</Link>
+      </S.Card>
+    </S.Container>
   );
 };
 
